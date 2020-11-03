@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	. "github.com/nntaoli-project/goex"
-	"github.com/nntaoli-project/goex/internal/logger"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	. "github.com/nntaoli-project/goex"
+	"github.com/nntaoli-project/goex/internal/logger"
 )
 
 type OKExV3SpotWs struct {
@@ -63,6 +64,16 @@ func (okV3Ws *OKExV3SpotWs) SubscribeDepth(currencyPair CurrencyPair) error {
 	return okV3Ws.v3Ws.Subscribe(map[string]interface{}{
 		"op":   "subscribe",
 		"args": []string{fmt.Sprintf("spot/depth5:%s", currencyPair.ToSymbol("-"))}})
+}
+
+func (okV3Ws *OKExV3SpotWs) SubscribeTBT(currencyPair CurrencyPair) error {
+	if okV3Ws.depthCallback == nil {
+		return errors.New("please set depth callback func")
+	}
+
+	return okV3Ws.v3Ws.Subscribe(map[string]interface{}{
+		"op":   "subscribe",
+		"args": []string{fmt.Sprintf("spot/depth_l2_tbt:%s", currencyPair.ToSymbol("-"))}})
 }
 
 func (okV3Ws *OKExV3SpotWs) SubscribeTicker(currencyPair CurrencyPair) error {
@@ -143,7 +154,7 @@ func (okV3Ws *OKExV3SpotWs) handle(ch string, data json.RawMessage) error {
 			})
 		}
 		return nil
-	case "spot/depth5":
+	case "spot/depth5", "spot/depth_l2_tbt":
 		err := json.Unmarshal(data, &depthResp)
 		if err != nil {
 			logger.Error(err)
