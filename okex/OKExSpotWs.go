@@ -176,7 +176,9 @@ func (okV3Ws *OKExV3SpotWs) handle(ch string, data json.RawMessage) error {
 				Price:  ToFloat64(itm[0]),
 				Amount: ToFloat64(itm[1])})
 		}
-		sort.Sort(sort.Reverse(dep.AskList))
+		// sort.Sort(sort.Reverse(dep.AskList))
+		sort.Sort(dep.AskList)
+		sort.Sort(dep.BidList)
 		//call back func
 		okV3Ws.depthCallback(&dep)
 		return nil
