@@ -6,12 +6,13 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"github.com/google/uuid"
 	"io/ioutil"
 	"math"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/google/uuid"
 )
 
 func ToFloat64(v interface{}) float64 {
@@ -129,4 +130,35 @@ func FlateDecompress(data []byte) ([]byte, error) {
 func GenerateOrderClientId(size int) string {
 	uuidStr := strings.Replace(uuid.New().String(), "-", "", 32)
 	return "goex" + uuidStr[0:size-5]
+}
+
+func MergeDepaths(oldDepths DepthRecords, newDepths DepthRecords) (DepthRecords, error) {
+	newRecord := DepthRecords{}
+	oldIdx, newIdx := 0, 0
+
+	for oldIdx < oldDepths.Len() && newIdx < newDepths.Len() {
+		oldItem := oldDepths[oldIdx]
+		newItem := newDepths[newIdx]
+
+		if oldItem.Price == newItem.Price {
+			if newItem.Amount != 0 {
+				newRecord = append(newRecord, newItem)
+			}
+			oldIdx++
+			newIdx++
+		} else if oldItem.Price > newItem.Price {
+			newRecord = append(newRecord, newItem)
+			newIdx++
+		} else if oldItem.Price < newItem.Price {
+			newRecord = append(newRecord, oldItem)
+			oldIdx++
+		}
+	}
+	for ; oldIdx < oldDepths.Len(); oldIdx++ {
+		newRecord = append(newRecord, oldDepths[oldIdx])
+	}
+	for ; newIdx < newDepths.Len(); newIdx++ {
+		newRecord = append(newRecord, newDepths[newIdx])
+	}
+	return newRecord, nil
 }
