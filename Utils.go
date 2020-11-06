@@ -141,13 +141,15 @@ func MergeDepaths(oldDepths DepthRecords, newDepths DepthRecords) (DepthRecords,
 		newItem := newDepths[newIdx]
 
 		if oldItem.Price == newItem.Price {
-			if newItem.Amount != 0 {
+			if newItem.Amount > 0 {
 				newRecord = append(newRecord, newItem)
 			}
 			oldIdx++
 			newIdx++
 		} else if oldItem.Price > newItem.Price {
-			newRecord = append(newRecord, newItem)
+			if newItem.Amount > 0 {
+				newRecord = append(newRecord, newItem)
+			}
 			newIdx++
 		} else if oldItem.Price < newItem.Price {
 			newRecord = append(newRecord, oldItem)
@@ -158,7 +160,9 @@ func MergeDepaths(oldDepths DepthRecords, newDepths DepthRecords) (DepthRecords,
 		newRecord = append(newRecord, oldDepths[oldIdx])
 	}
 	for ; newIdx < newDepths.Len(); newIdx++ {
-		newRecord = append(newRecord, newDepths[newIdx])
+		if newDepths[newIdx].Amount > 0 {
+			newRecord = append(newRecord, newDepths[newIdx])
+		}
 	}
 	return newRecord, nil
 }
