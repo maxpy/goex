@@ -1,6 +1,7 @@
 package goex
 
 import (
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -100,6 +101,19 @@ func (dr DepthRecords) Swap(i, j int) {
 
 func (dr DepthRecords) Less(i, j int) bool {
 	return dr[i].Price < dr[j].Price
+}
+
+func (dr DepthRecords) ToList() [][2]float64 {
+	ret := make([][2]float64, dr.Len())
+	for i, d := range dr {
+		ret[i][0] = d.Price
+		ret[i][1] = d.Amount
+	}
+	return ret
+}
+
+func (d *DepthRecord) String() string {
+	return fmt.Sprintf("[%f, %f]", d.Price, d.Amount)
 }
 
 type Depth struct {
