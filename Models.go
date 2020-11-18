@@ -123,6 +123,16 @@ type Depth struct {
 	UTime        time.Time
 	AskList      DepthRecords // Descending order
 	BidList      DepthRecords // Descending order
+	ts           int64        // timestamp utc time ms
+}
+
+func (depth *Depth) GetOfferStr() string {
+	if depth.AskList.Len() < 1 || depth.BidList.Len() < 1 {
+		return ""
+	}
+	bestAsk := depth.AskList[0]
+	bestBid := depth.BidList[depth.BidList.Len()-1]
+	return fmt.Sprintf("%.10f,%.10f,%.10f,%.10f", bestBid.Price, bestBid.Amount, bestAsk.Price, bestAsk.Amount)
 }
 
 type APIConfig struct {
