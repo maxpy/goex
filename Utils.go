@@ -132,7 +132,7 @@ func GenerateOrderClientId(size int) string {
 	return "goex" + uuidStr[0:size-5]
 }
 
-func MergeDepaths(oldDepths DepthRecords, newDepths DepthRecords) (DepthRecords, error) {
+func MergeDepths(oldDepths DepthRecords, newDepths DepthRecords) (DepthRecords, error) {
 	newRecord := DepthRecords{}
 	oldIdx, newIdx := 0, 0
 
