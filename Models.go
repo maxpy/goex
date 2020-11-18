@@ -123,7 +123,7 @@ type Depth struct {
 	UTime        time.Time
 	AskList      DepthRecords // Descending order
 	BidList      DepthRecords // Descending order
-	ts           int64        // timestamp utc time ms
+	Ts           int64        // timestamp utc time ms
 }
 
 func (depth *Depth) GetOfferStr() string {

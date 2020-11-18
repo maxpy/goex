@@ -166,6 +166,7 @@ func (okV3Ws *OKExV3SpotWs) handle(ch string, data json.RawMessage) error {
 
 		dep.Pair = okV3Ws.getCurrencyPair(depthResp[0].InstrumentId)
 		dep.UTime, _ = time.Parse(time.RFC3339, depthResp[0].Timestamp)
+		dep.Ts = dep.UTime.UnixNano() / 1e6
 		for _, itm := range depthResp[0].Asks {
 			dep.AskList = append(dep.AskList, DepthRecord{
 				Price:  ToFloat64(itm[0]),
