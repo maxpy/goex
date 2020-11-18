@@ -166,3 +166,32 @@ func MergeDepaths(oldDepths DepthRecords, newDepths DepthRecords) (DepthRecords,
 	}
 	return newRecord, nil
 }
+
+//CorrectDepth 使用Trade修正Orderbook 盘口
+func CorrectDepths(depths DepthRecords, IsAskDepth bool, trade *Trade) DepthRecords {
+	newRecord := DepthRecords{}
+	for i := 0; i < depths.Len(); i++ {
+		dr := depths[i]
+		if IsAskDepth {
+			if dr.Price > trade.Price { // 高于成交价的卖盘保留
+				newRecord = append(newRecord, dr)
+			} else if dr.Price == trade.Price && trade.Type != SELL {
+				dr.Amount -= trade.Amount
+				if dr.Amount > 0 {
+					newRecord = append(newRecord, dr)
+				}
+			}
+		} else {
+			if dr.Price < trade.Price { // 低于成交价的买盘保留
+				newRecord = append(newRecord, dr)
+			} else if dr.Price == trade.Price && trade.Type != BUY {
+				dr.Amount -= trade.Amount
+				if dr.Amount > 0 {
+					newRecord = append(newRecord, dr)
+				}
+			}
+		}
+
+	}
+	return newRecord
+}

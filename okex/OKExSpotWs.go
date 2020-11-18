@@ -123,7 +123,7 @@ func (okV3Ws *OKExV3SpotWs) handle(ch string, data json.RawMessage) error {
 			Side         string  `json:"side"`
 			TradeId      int64   `json:"trade_id,string"`
 			Price        float64 `json:"price,string"`
-			Qty          float64 `json:"qty,string"`
+			Qty          float64 `json:"size,string"`
 			InstrumentId string  `json:"instrument_id"`
 			Timestamp    string  `json:"timestamp"`
 		}
@@ -166,6 +166,7 @@ func (okV3Ws *OKExV3SpotWs) handle(ch string, data json.RawMessage) error {
 
 		dep.Pair = okV3Ws.getCurrencyPair(depthResp[0].InstrumentId)
 		dep.UTime, _ = time.Parse(time.RFC3339, depthResp[0].Timestamp)
+		dep.ts = dep.UTime.UnixNano() / 1e6
 		for _, itm := range depthResp[0].Asks {
 			dep.AskList = append(dep.AskList, DepthRecord{
 				Price:  ToFloat64(itm[0]),
@@ -206,7 +207,7 @@ func (okV3Ws *OKExV3SpotWs) handle(ch string, data json.RawMessage) error {
 				Type:   tradeSide,
 				Amount: resp.Qty,
 				Price:  resp.Price,
-				Date:   t.Unix(),
+				Date:   t.UnixNano() / 1e6,
 				Pair:   okV3Ws.getCurrencyPair(resp.InstrumentId),
 			})
 		}
